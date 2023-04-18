@@ -13,6 +13,7 @@
   "license": "ISC",
   "dependencies": {
     "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "express-session": "^1.17.3",
     "helmet": "^6.0.1",
@@ -23,7 +24,6 @@
     "sequelize": "^6.29.3"
   },
   "devDependencies": {
-    "dotenv": "^16.0.3",
     "eslint": "^8.32.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-node": "^4.1.0",
