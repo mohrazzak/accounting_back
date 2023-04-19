@@ -3,7 +3,7 @@ const express = require(`express`);
 const cors = require('cors');
 const morgan = require('morgan');
 const helmet = require('helmet');
-const session = require('express-session');
+const session = require('cookie-session');
 // related imports
 const routes = require('./routes');
 
