@@ -20,6 +20,8 @@ const app = express();
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use(helmet());
+app.set('trust proxy', 1); // trust first proxy
+
 const sessionConfig = {
   secret: tokenSecret,
   cookie: {
