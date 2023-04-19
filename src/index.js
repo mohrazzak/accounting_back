@@ -30,9 +30,19 @@ const sessionConfig = {
   resave: true,
   saveUninitialized: true,
 };
-app.use(
-  session({ ...sessionConfig, sameSite: 'none', secure: true, httpOnly: true })
-);
+const sessionOptions = {
+  secret: tokenSecret, // Replace with your own secret key
+  keys: [tokenSecret], // Replace with your own secret key
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    secure: true, // Set to true if your site uses HTTPS
+    httpOnly: true, // Prevent client-side JavaScript from accessing the cookie
+    sameSite: 'none', // Set to "none" if using cross-site requests (e.g., with CORS)
+    maxAge: 3600000, // Set the maximum age of the cookie (in milliseconds) to 1 hour
+  },
+};
+app.use(session(sessionOptions));
 
 app.use(morgan('dev'));
 console.log(NODE_ENV === 'production' ? PRO_URL : LOCAL_URL);
