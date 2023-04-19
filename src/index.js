@@ -25,7 +25,7 @@ const sessionConfig = {
   saveUninitialized: true,
   cookie: {
     maxAge: 1000 * 60 * 60 * 1,
-    secure: NODE_ENV === 'production',
+    // secure: NODE_ENV === 'production',
     httpOnly: false,
     sameSite: NODE_ENV === 'production' ? 'none' : 'lax',
   },
