@@ -5,15 +5,16 @@ const {
   deleteDailyBill,
   editDailyBill,
 } = require('./daily.controllers');
+const { isAuth } = require('../../middlewares');
 
 const router = Router();
 
-router.get('/', getAllDailyBills);
+router.get('/', isAuth, getAllDailyBills);
 
-router.post('/', addDailyBill);
+router.post('/', isAuth, addDailyBill);
 
-router.put('/:billId', editDailyBill);
+router.put('/:billId', isAuth, editDailyBill);
 
-router.delete('/:billId', deleteDailyBill);
+router.delete('/:billId', isAuth, deleteDailyBill);
 
 module.exports = router;
