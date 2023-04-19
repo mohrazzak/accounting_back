@@ -30,7 +30,7 @@ const sessionConfig = {
   resave: true,
   saveUninitialized: true,
 };
-app.use(session({ sessionConfig, sameSite: 'none' }));
+app.use(session({ ...sessionConfig, sameSite: 'none' }));
 
 app.use(morgan('dev'));
 console.log(NODE_ENV === 'production' ? PRO_URL : LOCAL_URL);
