@@ -12,7 +12,7 @@ async function login(req, res, next) {
       throw new ApiError('الحساب مسجل الدخول مسبقا', StatusCodes.BAD_REQUEST);
     const { password } = req.body;
     console.log(password);
-    if (password?.toString() !== '123')
+    if (password?.toString() !== WEBSITE_PASSWORD)
       throw new ApiError('كلمةالسر غير صحيحة', StatusCodes.UNAUTHORIZED);
     req.session.isAuth = true;
     return responser(res, StatusCodes.ACCEPTED);
