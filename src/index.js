@@ -25,15 +25,15 @@ const sessionConfig = {
   saveUninitialized: true,
   cookie: {
     maxAge: 1000 * 60 * 60 * 1,
-    // secure: NODE_ENV === 'production',
-    // httpOnly: false,
-    // sameSite: NODE_ENV === 'production' ? 'none' : 'lax',
+    secure: NODE_ENV === 'production',
+    httpOnly: false,
+    sameSite: NODE_ENV === 'production' ? 'none' : 'lax',
   },
   resave: false,
 };
 
 if (NODE_ENV === 'production') {
-  app.set('trust proxy', 99999999999999); // trust first proxy
+  app.set('trust proxy'); // trust first proxy
   sessionConfig.cookie.secure = true; // serve secure cookies
 }
 
@@ -42,7 +42,7 @@ app.use(session(sessionConfig));
 app.use(morgan('dev'));
 const corsOptions = {
   credentials: true,
-  // origin: NODE_ENV === 'production' ? PRO_URL : LOCAL_URL,
+  origin: NODE_ENV === 'production' ? PRO_URL : LOCAL_URL,
 };
 app.use(cors(corsOptions));
 
