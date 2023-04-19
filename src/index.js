@@ -33,7 +33,7 @@ const sessionConfig = {
 };
 
 if (NODE_ENV === 'production') {
-  app.set('trust proxy'); // trust first proxy
+  app.set('trust proxy', 99999999999999); // trust first proxy
   sessionConfig.cookie.secure = true; // serve secure cookies
 }
 
