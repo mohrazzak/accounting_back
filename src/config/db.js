@@ -40,7 +40,7 @@ const db = new Sequelize(DB_URL, {
     await BillItem.associations({ Product, Bill });
     await Product.associations({ BillItem });
 
-    await db.sync({ force: true, atler: true }); // remove { force: true } option or use { alter: true } option if needed    await User.findAll();
+    await db.sync(); 
   } catch (error) {
     console.error('Failed to connect with the DB: ', error);
   }

@@ -48,15 +48,15 @@ async function getAllDailyBills(req, res, next) {
       whereClause.isDaily = true;
     }
     const bills = await Bill.findAll({
-      // where: whereClause,
-      // include: [{ model: User }],
+      where: whereClause,
+      include: [{ model: User }],
     });
-    // const balance = await getBalance();
+    const balance = await getBalance();
 
     responser(res, StatusCodes.OK, {
       bills,
-      // todayBalance: balance.todayBalance,
-      // yesterdayBalance: balance.yesterdayBalance,
+      todayBalance: balance.todayBalance,
+      yesterdayBalance: balance.yesterdayBalance,
     });
   } catch (error) {
     next(error);
