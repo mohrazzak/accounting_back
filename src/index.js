@@ -38,7 +38,7 @@ const sessionConfig = {
 app.use(session(sessionConfig));
 
 app.use(morgan('dev'));
-console.log('production' ? PRO_URL : LOCAL_URL);
+console.log(NODE_ENV === 'production' ? PRO_URL : LOCAL_URL);
 const corsOptions = {
   credentials: true,
   origin: NODE_ENV === 'production' ? PRO_URL : LOCAL_URL,
