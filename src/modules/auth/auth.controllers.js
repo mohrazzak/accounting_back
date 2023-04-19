@@ -22,9 +22,6 @@ async function login(req, res, next) {
 
 async function logout(req, res, next) {
   try {
-    console.log(req.isAuth);
-    if (!req.session.isAuth)
-      throw new ApiError('يرجى تسجيل الدخول اولاً', StatusCodes.UNAUTHORIZED);
     await req.session.destroy();
     return responser(res, StatusCodes.ACCEPTED);
   } catch (error) {
