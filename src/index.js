@@ -20,27 +20,32 @@ const app = express();
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use(helmet());
-app.use(
-  session({
-    secret: tokenSecret,
-    saveUninitialized: true,
-    cookie: {
-      maxAge: 1000 * 60 * 60 * 1,
-      secure: NODE_ENV === 'production',
-      httpOnly: false,
-      sameSite: 'none',
-    },
-    resave: false,
-  })
-);
+const sessionConfig = {
+  secret: tokenSecret,
+  saveUninitialized: true,
+  cookie: {
+    maxAge: 1000 * 60 * 60 * 1,
+    secure: NODE_ENV === 'production',
+    httpOnly: false,
+    sameSite: NODE_ENV === 'production' ? 'none' : 'lax',
+  },
+  resave: false,
+};
+
+if (NODE_ENV === 'production') {
+  app.set('trust proxy', 1); // trust first proxy
+  sessionConfig.cookie.secure = true; // serve secure cookies
+}
+
+app.use(session(sessionConfig));
+
 app.use(morgan('dev'));
 console.log(LOCAL_URL);
-app.use(
-  cors({
-    credentials: true,
-    origin: 'http://localhost:5173',
-  })
-);
+const corsOptions = {
+  credentials: true,
+  origin: NODE_ENV === 'production' ? PRO_URL : LOCAL_URL,
+};
+app.use(cors(corsOptions));
 
 app.use(routes);
 
