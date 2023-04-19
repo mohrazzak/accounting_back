@@ -32,10 +32,10 @@ const sessionConfig = {
   resave: false,
 };
 
-if (NODE_ENV === 'production') {
-  app.set('trust proxy', 1); // trust first proxy
-  sessionConfig.cookie.secure = true; // serve secure cookies
-}
+// if (NODE_ENV === 'production') {
+//   app.set('trust proxy', 1); // trust first proxy
+//   sessionConfig.cookie.secure = true; // serve secure cookies
+// }
 
 app.use(session(sessionConfig));
 
