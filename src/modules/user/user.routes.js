@@ -8,11 +8,12 @@ const {
   getUserBill,
   addUserBill,
 } = require('./user.controllers');
+const { isAuth } = require('../../middlewares');
 
 const router = Router();
 
 // GET all users
-router.get('/', getAllUsers);
+router.get('/', isAuth, getAllUsers);
 
 // GET a user by ID
 router.get('/:userId', getUser);

@@ -1,15 +1,7 @@
 /* eslint-disable global-require */
 const { Sequelize } = require('sequelize');
 
-const {
-  DB_DIALACT,
-  DB_HOST,
-  DB_NAME,
-  DB_PASSWORD,
-  DB_USERNAME,
-  DB_PORT,
-  DB_URL,
-} = require('./constants');
+const { DB_URL } = require('./constants');
 
 const db = new Sequelize(DB_URL, {
   // dialectOptions: {
@@ -40,7 +32,7 @@ const db = new Sequelize(DB_URL, {
     await BillItem.associations({ Product, Bill });
     await Product.associations({ BillItem });
 
-    await db.sync(); 
+    await db.sync();
   } catch (error) {
     console.error('Failed to connect with the DB: ', error);
   }

@@ -1,24 +1,13 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 require('dotenv').config();
 
-const {
-  DB_USERNAME,
-  DB_PASSWORD,
-  DB_DIALACT,
-  DB_NAME,
-  DB_HOST,
-  DB_PORT,
-  DB_URL,
-  WEBSITE_PASSWORD,
-} = process.env;
-
+const { tokenSecret, WEBSITE_PASSWORD, DB_URL, LOCAL_URL, PRO_URL, NODE_ENV } =
+  process.env;
 module.exports = Object.freeze({
-  DB_USERNAME,
-  DB_PASSWORD,
-  DB_DIALACT,
-  DB_NAME,
-  DB_HOST,
-  DB_PORT,
-  DB_URL,
   WEBSITE_PASSWORD,
+  tokenSecret,
+  DB_URL,
+  LOCAL_URL,
+  NODE_ENV,
+  PRO_URL,
 });

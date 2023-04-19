@@ -9,6 +9,12 @@ const routes = require('./routes');
 
 // utils
 const { error404, nextHandler } = require('./utils/errors');
+const {
+  tokenSecret,
+  NODE_ENV,
+  LOCAL_URL,
+  PRO_URL,
+} = require('./config/constants');
 
 const app = express();
 app.use(express.urlencoded({ extended: false }));
@@ -16,14 +22,17 @@ app.use(express.json());
 app.use(helmet());
 app.use(
   session({
-    secret: 'secret',
+    secret: tokenSecret,
+    saveUninitialized: true,
+    cookie: { maxAge: 1000 * 60 * 60 * 1 },
     resave: false,
-    saveUninitialized: false,
-    // cookie: { maxAge: 1000 * 60 * 60 * 1 }, // 1h
   })
 );
 app.use(morgan('dev'));
-app.use(cors());
+console.log(LOCAL_URL);
+app.use(
+  cors({ credentials: true, origin: NODE_ENV === 'dev' ? LOCAL_URL : PRO_URL })
+);
 
 app.use(routes);
 

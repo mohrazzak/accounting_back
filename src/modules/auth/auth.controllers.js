@@ -1,4 +1,3 @@
-const crypto = require('crypto');
 const { StatusCodes } = require('http-status-codes');
 const { responser } = require('../../utils');
 const { ApiError } = require('../../utils/errors');
@@ -23,9 +22,10 @@ async function login(req, res, next) {
 
 async function logout(req, res, next) {
   try {
+    console.log(req.isAuth);
     if (!req.session.isAuth)
       throw new ApiError('يرجى تسجيل الدخول اولاً', StatusCodes.UNAUTHORIZED);
-    req.session.destroy();
+    await req.session.destroy();
     return responser(res, StatusCodes.ACCEPTED);
   } catch (error) {
     return next(error);
