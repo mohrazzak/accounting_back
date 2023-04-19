@@ -42,7 +42,7 @@ app.use(session(sessionConfig));
 app.use(morgan('dev'));
 const corsOptions = {
   credentials: true,
-  origin: NODE_ENV === 'production' ? PRO_URL : LOCAL_URL,
+  // origin: NODE_ENV === 'production' ? PRO_URL : LOCAL_URL,
 };
 app.use(cors(corsOptions));
 
