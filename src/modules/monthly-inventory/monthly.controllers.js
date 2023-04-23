@@ -39,8 +39,8 @@ const billTypes = ['ادخال', 'صادر', 'مصروف', 'سحوبات'];
 //         const monthlyInventory = {};
 //         monthlyTotals.forEach((item) => {
 //           monthlyInventory[item.dataValues.month] = {
-//             value: parseInt(item.dataValues.value, 10),
-//             values: parseInt(item.dataValues.values, 10),
+//             value: parseFloat(item.dataValues.value, 10),
+//             values: parseFloat(item.dataValues.values, 10),
 //           };
 //         });
 //         return { billType, monthlyInventory };

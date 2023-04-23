@@ -16,21 +16,21 @@ const router = Router();
 router.get('/', isAuth, getAllUsers);
 
 // GET a user by ID
-router.get('/:userId', getUser);
+router.get('/:userId',isAuth, getUser);
 
 // CREATE a new user
-router.post('/', addUser);
+router.post('/',isAuth,  addUser);
 
 // UPDATE a user by ID
-router.put('/:userId', editUser);
+router.put('/:userId',isAuth,  editUser);
 
 // DELETE a user by ID
-router.delete('/:userId', deleteUser);
+router.delete('/:userId',isAuth,  deleteUser);
 
 // get single user bill items
-router.get('/:userId/bills/:billId', getUserBill);
+router.get('/:userId/bills/:billId',isAuth,  getUserBill);
 
 // add user bill with bill items
-router.post('/:userId/full', addUserBill);
+router.post('/:userId/full', isAuth, addUserBill);
 
 module.exports = router;

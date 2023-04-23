@@ -7,8 +7,6 @@ const {
 
 async function login(req, res, next) {
   try {
-    if (req.session.isAuth)
-      throw new ApiError('الحساب مسجل الدخول مسبقا', StatusCodes.BAD_REQUEST);
     const { password } = req.body;
     console.log(password);
     if (password?.toString() !== WEBSITE_PASSWORD)
