@@ -18,8 +18,8 @@ const User = db.define(
       allowNull: false,
     },
     note: { type: DataTypes.STRING, allowNull: true },
-    accountBalance: { type: DataTypes.INTEGER, defaultValue: 0 },
-    accountBalanceValues: { type: DataTypes.INTEGER, defaultValue: 0 },
+    accountBalance: { type: DataTypes.BIGINT, defaultValue: 0 },
+    accountBalanceValues: { type: DataTypes.BIGINT, defaultValue: 0 },
     createdAt: { type: DataTypes.DATEONLY, defaultValue: DataTypes.NOW },
   },
   { timestamps: false }

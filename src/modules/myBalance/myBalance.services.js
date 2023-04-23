@@ -66,8 +66,8 @@ async function getBalance() {
       order: [[Sequelize.fn('max', Sequelize.col('createdAt')), 'DESC']],
     });
     await MyBalance.create({
-      yesterdayValue: lastCreated?.todayValue ?? 0,
-      yesterdayValues: lastCreated?.todayValues ?? 0,
+      yesterdayValue: lastCreated?.todayValue + lastCreated?.yesterdayValue ?? 0,
+      yesterdayValues: lastCreated?.todayValues + lastCreated?.yesterdayValues ?? 0,
     });
   } else {
     return {

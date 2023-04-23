@@ -4,8 +4,8 @@ const db = require('../../config/db');
 const Bill = db.define(
   'Bill',
   {
-    values: { type: DataTypes.INTEGER, allowNull: true, defaultValue: 0 },
-    value: { type: DataTypes.INTEGER, allowNull: true, defaultValue: 0 },
+    values: { type: DataTypes.BIGINT, allowNull: true, defaultValue: 0 },
+    value: { type: DataTypes.BIGINT, allowNull: true, defaultValue: 0 },
     billType: {
       type: DataTypes.ENUM('ادخال', 'صادر', 'مصروف', 'سحوبات'),
       allowNull: true,
