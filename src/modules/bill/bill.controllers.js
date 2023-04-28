@@ -430,6 +430,28 @@ async function transfer(req, res, next) {
   }
 }
 
+async function userTransfer(req, res, next) {
+  try {
+    const { transferType, value, values, price, user: userId } = req.body;
+    const parsedValue = parseFloat(value, 10);
+    // const parsedPrice = parseFloat(price, 10);
+    const parsedValues = parseFloat(values, 10);
+    const user = await User.findByPk(userId);
+    if (transferType === 'valueToValues') {
+      user.accountBalance -= parsedValue;
+      user.accountBalanceValues += parsedValues;
+      await user.save();
+    } else {
+      user.accountBalance += parsedValue;
+      user.accountBalanceValues -= parsedValues;
+    }
+    await user.save();
+    responser(res, StatusCodes.OK);
+  } catch (error) {
+    next(error);
+  }
+}
+
 module.exports = {
   getAllBills,
   getBill,
@@ -440,4 +462,5 @@ module.exports = {
   deleteBillItem,
   editBillItem,
   transfer,
+  userTransfer, 
 };

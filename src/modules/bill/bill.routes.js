@@ -10,6 +10,7 @@ const {
   deleteBillItem,
   transfer,
   editBillItem,
+  userTransfer,
 } = require('./bill.controllers');
 
 const router = Router();
@@ -27,6 +28,7 @@ router.put('/items/:billId/:billItem', isAuth, editBillItem);
 router.delete('/items/:billId/:billItemId', isAuth, deleteBillItem);
 
 router.post('/transfer', isAuth, transfer);
+router.post('/userTransfer', isAuth, userTransfer);
 
 router.put('/:billId', isAuth, editBill);
 

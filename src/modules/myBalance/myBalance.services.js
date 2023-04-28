@@ -1,3 +1,4 @@
+/* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable no-restricted-syntax */
 const { Op, Sequelize } = require('sequelize');
 const { Bill } = require('../bill/bill.model');
@@ -47,9 +48,7 @@ async function subtractFromBalance(valueToSubtract, valuesToSubtract) {
 async function getBalance() {
   const todayBalanceExists = await MyBalance.findOne({
     where: {
-      createdAt: {
-        [Op.between]: [startOfDay, endOfDay],
-      },
+      createdAt: startOfDay,
     },
   });
   if (!todayBalanceExists) {
@@ -66,8 +65,10 @@ async function getBalance() {
       order: [[Sequelize.fn('max', Sequelize.col('createdAt')), 'DESC']],
     });
     await MyBalance.create({
-      yesterdayValue: lastCreated?.todayValue + lastCreated?.yesterdayValue ?? 0,
-      yesterdayValues: lastCreated?.todayValues + lastCreated?.yesterdayValues ?? 0,
+      yesterdayValue:
+        lastCreated?.todayValue + lastCreated?.yesterdayValue ?? 0,
+      yesterdayValues:
+        lastCreated?.todayValues + lastCreated?.yesterdayValues ?? 0,
     });
   } else {
     return {
@@ -111,9 +112,7 @@ async function getBalance() {
 
   const todayBills = await Bill.findAll({
     where: {
-      createdAt: {
-        [Op.gte]: new Date(),
-      },
+      createdAt: today,
     },
     attributes: ['value', 'values', 'billType'],
   });
@@ -140,4 +139,40 @@ async function getBalance() {
   };
 }
 
-module.exports = { addToBalance, subtractFromBalance, getBalance };
+async function getPrevBalance(date) {
+  const todayDate = new Date(date.year, +date.month - 1, +date.day + 1);
+  const lastBalanceBeforeToday = await MyBalance.findOne({
+    where: { createdAt: { [Op.lt]: todayDate } },
+    order: [['id', 'DESC']],
+  });
+  console.log(lastBalanceBeforeToday?.toJSON(), 'lastcreated');
+  if (lastBalanceBeforeToday)
+    return {
+      todayBalance: {
+        value: lastBalanceBeforeToday.todayValue,
+        values: lastBalanceBeforeToday.todayValues,
+      },
+      yesterdayBalance: {
+        value: lastBalanceBeforeToday.yesterdayValue,
+        values: lastBalanceBeforeToday.yesterdayValues,
+      },
+    };
+  // else
+  return {
+    todayBalance: {
+      value: 0,
+      values: 0,
+    },
+    yesterdayBalance: {
+      value: 0,
+      values: 0,
+    },
+  };
+}
+
+module.exports = {
+  addToBalance,
+  subtractFromBalance,
+  getBalance,
+  getPrevBalance,
+};

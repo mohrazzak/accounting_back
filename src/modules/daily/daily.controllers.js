@@ -8,34 +8,31 @@ const {
   getBalance,
   subtractFromBalance,
   addToBalance,
+  getPrevBalance,
 } = require('../myBalance/myBalance.services');
 const { User } = require('../user/user.model');
 const { BillItem } = require('../bill_item/bill_item.model');
 const { Product } = require('../product/product.model');
 
 async function getAllDailyBills(req, res, next) {
-  const { all, userId, isDaily, billType } = req.query;
+  const { all, userId, isDaily, billType, day, year, month } = req.query;
   try {
-    const today = new Date();
+    const today = new Date(year, +month - 1, +day + 1);
+    console.log(today);
+    const startOfActualDay = new Date();
+    startOfActualDay.setHours(0, 0, 0, 0);
+    const nextDay = new Date(startOfActualDay);
+    nextDay.setDate(startOfActualDay.getDate() + 1);
     const startOfDay = new Date(
       today.getFullYear(),
       today.getMonth(),
-      today.getDate()
-    );
-    const endOfDay = new Date(
-      today.getFullYear(),
-      today.getMonth(),
-      today.getDate() + 1
+      today.getDay()
     );
 
     const whereClause = {};
-
     if (!all) {
-      whereClause.createdAt = {
-        [Op.between]: [startOfDay, endOfDay],
-      };
+      whereClause.createdAt = today - 1;
     }
-
     if (userId) {
       whereClause.UserId = userId;
     }
@@ -47,12 +44,17 @@ async function getAllDailyBills(req, res, next) {
     if (isDaily) {
       whereClause.isDaily = true;
     }
+    console.log(whereClause);
     const bills = await Bill.findAll({
       where: whereClause,
       include: [{ model: User }],
     });
-    const balance = await getBalance();
+    let balance;
+    // console.log(today, nextDay);
+    if (today < nextDay) balance = await getPrevBalance({ day, year, month });
+    else balance = await getBalance({ day, year, month });
 
+    // console.log(balance);
     responser(res, StatusCodes.OK, {
       bills,
       todayBalance: balance.todayBalance,
@@ -154,7 +156,6 @@ async function editDailyBill(req, res, next) {
         'لايمكنك تغيير الحساب الخاص بالفاتورة, يرجى حذف الفاتورة وانشاء فاتورة جديدة',
         StatusCodes.BAD_REQUEST
       );
-
 
     if (billType !== bill.billType)
       throw new ApiError(
