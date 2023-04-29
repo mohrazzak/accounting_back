@@ -149,16 +149,12 @@ async function getPrevBalance(date) {
   if (lastBalanceBeforeToday)
     return {
       todayBalance: {
-        value:
-          lastBalanceBeforeToday.todayValue +
-          lastBalanceBeforeToday.yesterdayValue,
-        values:
-          lastBalanceBeforeToday.todayValues +
-          lastBalanceBeforeToday.yesterdayValues,
+        value: lastBalanceBeforeToday.todayValue,
+        values: lastBalanceBeforeToday.todayValues,
       },
       yesterdayBalance: {
-        value: 0,
-        values: 0,
+        value: lastBalanceBeforeToday.yesterdayValue,
+        values: lastBalanceBeforeToday.yesterdayValues,
       },
     };
   // else
