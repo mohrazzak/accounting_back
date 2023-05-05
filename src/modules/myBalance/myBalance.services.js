@@ -1,29 +1,19 @@
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable no-restricted-syntax */
 const { Op, Sequelize } = require('sequelize');
+const moment = require('moment');
 const { Bill } = require('../bill/bill.model');
 const { MyBalance } = require('./MyBalance.model');
 
-const today = new Date();
-const startOfDay = new Date(
-  today.getFullYear(),
-  today.getMonth(),
-  today.getDate()
-);
-const endOfDay = new Date(
-  today.getFullYear(),
-  today.getMonth(),
-  today.getDate() + 1
-);
+const today = moment().local().startOf('day').add(3, 'hours');
 
 async function addToBalance(valueToAdd, valuesToAdd) {
   const balance = await MyBalance.findOne({
     where: {
-      createdAt: {
-        [Op.between]: [startOfDay, endOfDay],
-      },
+      createdAt: today.format('YYYY-MM-DD'),
     },
   });
+  console.log(balance);
 
   balance.todayValue += valueToAdd;
   balance.todayValues += valuesToAdd;
@@ -33,9 +23,7 @@ async function addToBalance(valueToAdd, valuesToAdd) {
 async function subtractFromBalance(valueToSubtract, valuesToSubtract) {
   const balance = await MyBalance.findOne({
     where: {
-      createdAt: {
-        [Op.between]: [startOfDay, endOfDay],
-      },
+      createdAt: today.format('YYYY-MM-DD'),
     },
   });
 
@@ -45,127 +33,97 @@ async function subtractFromBalance(valueToSubtract, valuesToSubtract) {
   return balance;
 }
 
-async function getBalance() {
-  const todayBalanceExists = await MyBalance.findOne({
+async function getBalance(selectedDay) {
+  // IF BALANCE EXISTS RETURN IT
+  // ELSE CREATE ONE WITH LATEST BALANCE VALUES
+  const balance = await MyBalance.findOne({
     where: {
-      createdAt: startOfDay,
+      createdAt: selectedDay.toDate(),
     },
   });
-  if (!todayBalanceExists) {
-    const lastCreated = await MyBalance.findOne({
-      attributes: [
-        'id',
-        'todayValues',
-        'todayValue',
-        'yesterdayValues',
-        'yesterdayValue',
-        'createdAt',
-      ],
-      group: ['createdAt'],
-      order: [[Sequelize.fn('max', Sequelize.col('createdAt')), 'DESC']],
-    });
-    await MyBalance.create({
-      yesterdayValue:
-        lastCreated?.todayValue + lastCreated?.yesterdayValue ?? 0,
-      yesterdayValues:
-        lastCreated?.todayValues + lastCreated?.yesterdayValues ?? 0,
-    });
-  } else {
+  if (balance)
     return {
       todayBalance: {
-        value:
-          todayBalanceExists.todayValue + todayBalanceExists.yesterdayValue,
-        values:
-          todayBalanceExists.todayValues + todayBalanceExists.yesterdayValues,
+        value: balance.todayValue,
+        values: balance.todayValues,
       },
       yesterdayBalance: {
-        value: todayBalanceExists.yesterdayValue,
-        values: todayBalanceExists.yesterdayValues,
+        value: balance.yesterdayValue,
+        values: balance.yesterdayValues,
       },
     };
-  }
 
-  const bills = await Bill.findAll({
+  const prevBalance = await MyBalance.findOne({
     where: {
       createdAt: {
-        [Op.lte]: startOfDay,
+        [Op.lt]: selectedDay.toDate(),
       },
     },
-    attributes: ['value', 'values', 'billType'],
+    order: [['createdAt', 'DESC']],
   });
 
-  let yesterdayBalance = { value: 0, values: 0 };
-
-  for (const bill of bills) {
-    if (bill.billType === 'ادخال') {
-      yesterdayBalance = {
-        value: yesterdayBalance.value + bill.value,
-        values: yesterdayBalance.values + bill.values,
-      };
-    } else {
-      yesterdayBalance = {
-        value: yesterdayBalance.value - bill.value,
-        values: yesterdayBalance.values - bill.values,
-      };
-    }
-  }
-
-  const todayBills = await Bill.findAll({
-    where: {
-      createdAt: today,
-    },
-    attributes: ['value', 'values', 'billType'],
-  });
-
-  let todayBalance = yesterdayBalance;
-
-  for (const bill of todayBills) {
-    if (bill.billType === 'ادخال') {
-      todayBalance = {
-        value: todayBalance.value + bill.value,
-        values: todayBalance.values + bill.values,
-      };
-    } else {
-      todayBalance = {
-        value: todayBalance.value - bill.value,
-        values: todayBalance.values - bill.values,
-      };
-    }
-  }
+  if (today.isSame(selectedDay))
+    await MyBalance.create({
+      todayValue: 0,
+      todayValues: 0,
+      yesterdayValue: prevBalance.yesterdayValue + prevBalance.todayValue,
+      yesterdayValues: prevBalance.yesterdayValues + prevBalance.todayValues,
+      createdAt: selectedDay.toDate(),
+    });
 
   return {
-    todayBalance,
-    yesterdayBalance,
+    todayBalance: {
+      value: prevBalance.todayValue,
+      values: prevBalance.todayValues,
+    },
+    yesterdayBalance: {
+      value: prevBalance.yesterdayValue,
+      values: prevBalance.yesterdayValues,
+    },
   };
 }
 
-async function getPrevBalance(date) {
-  const todayDate = new Date(date.year, +date.month - 1, +date.day + 1);
-  const lastBalanceBeforeToday = await MyBalance.findOne({
-    where: { createdAt: { [Op.lt]: todayDate } },
-    order: [['id', 'DESC']],
+async function getPrevBalance(selectedDay) {
+  const existingBalance = await MyBalance.findOne({
+    where: {
+      createdAt: selectedDay.toDate(),
+    },
   });
-  console.log(lastBalanceBeforeToday?.toJSON(), 'lastcreated');
-  if (lastBalanceBeforeToday)
+  if (existingBalance)
     return {
       todayBalance: {
-        value: lastBalanceBeforeToday.todayValue,
-        values: lastBalanceBeforeToday.todayValues,
+        value: existingBalance.todayValue,
+        values: existingBalance.todayValues,
       },
       yesterdayBalance: {
-        value: lastBalanceBeforeToday.yesterdayValue,
-        values: lastBalanceBeforeToday.yesterdayValues,
+        value: existingBalance.yesterdayValue,
+        values: existingBalance.yesterdayValues,
       },
     };
-  // else
+
+  const prevBalance = await MyBalance.findOne({
+    where: {
+      createdAt: {
+        [Op.lt]: selectedDay.toDate(),
+      },
+    },
+    order: [['createdAt', 'DESC']],
+  });
+  console.log(prevBalance?.toJSON());
+
+  if (!prevBalance)
+    return {
+      todayBalance: { value: 0, values: 0 },
+      yesterdayBalance: { value: 0, values: 0 },
+    };
   return {
     todayBalance: {
-      value: 0,
-      values: 0,
+      value: prevBalance.todayValue,
+      values: prevBalance.todayValues,
     },
     yesterdayBalance: {
-      value: 0,
-      values: 0,
+      value: prevBalance.yesterdayValue,
+      values: prevBalance.yesterdayValues,
     },
   };
 }

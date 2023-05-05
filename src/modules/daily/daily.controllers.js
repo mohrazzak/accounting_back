@@ -1,6 +1,7 @@
 /* eslint-disable no-await-in-loop */
 const { StatusCodes } = require('http-status-codes');
 const { Op } = require('sequelize');
+const moment = require('moment');
 const { Bill } = require('../bill/bill.model');
 const { responser } = require('../../utils');
 const { ApiError } = require('../../utils/errors');
@@ -17,21 +18,17 @@ const { Product } = require('../product/product.model');
 async function getAllDailyBills(req, res, next) {
   const { all, userId, isDaily, billType, day, year, month } = req.query;
   try {
-    const today = new Date(year, +month - 1, +day + 1);
-    console.log(today);
-    const startOfActualDay = new Date();
-    startOfActualDay.setHours(0, 0, 0, 0);
-    const nextDay = new Date(startOfActualDay);
-    nextDay.setDate(startOfActualDay.getDate() + 1);
-    const startOfDay = new Date(
-      today.getFullYear(),
-      today.getMonth(),
-      today.getDay()
-    );
-
+    const today = moment().local().startOf('day').add(3, 'hours');
+    let selectedDay = moment().local().startOf('day').add(3, 'hours');
+    if (year && month && day) {
+      selectedDay = moment(`${year}-${month}-${day}`, 'YYYY-MM-DD')
+        .startOf('day')
+        .add(3, 'hours');
+    }
+    console.log(selectedDay);
     const whereClause = {};
     if (!all) {
-      whereClause.createdAt = today - 1;
+      whereClause.createdAt = selectedDay.toISOString();
     }
     if (userId) {
       whereClause.UserId = userId;
@@ -44,17 +41,15 @@ async function getAllDailyBills(req, res, next) {
     if (isDaily) {
       whereClause.isDaily = true;
     }
-    console.log(whereClause);
     const bills = await Bill.findAll({
       where: whereClause,
       include: [{ model: User }],
     });
-    let balance;
-    // console.log(today, nextDay);
-    if (today < nextDay) balance = await getPrevBalance({ day, year, month });
-    else balance = await getBalance({ day, year, month });
 
-    // console.log(balance);
+    let balance;
+    if (today.isAfter(selectedDay)) balance = await getPrevBalance(selectedDay);
+    else balance = await getBalance(selectedDay);
+
     responser(res, StatusCodes.OK, {
       bills,
       todayBalance: balance.todayBalance,
