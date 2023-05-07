@@ -438,12 +438,24 @@ async function userTransfer(req, res, next) {
     const parsedValues = parseFloat(values, 10);
     const user = await User.findByPk(userId);
     if (transferType === 'valueToValues') {
-      user.accountBalance -= parsedValue;
-      user.accountBalanceValues += parsedValues;
+      if (user.userType === 'تاجر سوق') {
+        user.accountBalance += parsedValue;
+        user.accountBalanceValues -= parsedValues;
+      } else {
+        user.accountBalance -= parsedValue;
+        user.accountBalanceValues += parsedValues;
+      }
+
       await user.save();
     } else {
-      user.accountBalance += parsedValue;
-      user.accountBalanceValues -= parsedValues;
+      // eslint-disable-next-line no-lonely-if
+      if (user.userType === 'تاجر سوق') {
+        user.accountBalance -= parsedValue;
+        user.accountBalanceValues += parsedValues;
+      } else {
+        user.accountBalance += parsedValue;
+        user.accountBalanceValues -= parsedValues;
+      }
     }
     await user.save();
     responser(res, StatusCodes.OK);
@@ -462,5 +474,5 @@ module.exports = {
   deleteBillItem,
   editBillItem,
   transfer,
-  userTransfer, 
+  userTransfer,
 };
