@@ -27,7 +27,7 @@ async function getAllDailyBills(req, res, next) {
     }
     console.log(selectedDay);
     const whereClause = {};
-    if (!all) {
+    if (!all && !billType) {
       whereClause.createdAt = selectedDay.toISOString();
     }
     if (userId) {
@@ -41,6 +41,7 @@ async function getAllDailyBills(req, res, next) {
     if (isDaily) {
       whereClause.isDaily = true;
     }
+    console.log(whereClause);
     const bills = await Bill.findAll({
       where: whereClause,
       include: [{ model: User }],
