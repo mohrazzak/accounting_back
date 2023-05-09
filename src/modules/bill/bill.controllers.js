@@ -383,9 +383,9 @@ async function deleteBillItem(req, res, next) {
 async function transfer(req, res, next) {
   try {
     const { transferType, value, values, price } = req.body;
-    const parsedValue = parseFloat(value, 10);
-    const parsedPrice = parseFloat(price, 10);
-    const parsedValues = parseFloat(values, 10);
+    const parsedValue = parseFloat(value.toFixed(2), 10);
+    const parsedPrice = parseFloat(price.toFixed(2), 10);
+    const parsedValues = parseFloat(values.toFixed(2), 10);
     let firstBill;
     let secondBill;
     if (transferType === 'valueToValues') {
@@ -433,9 +433,9 @@ async function transfer(req, res, next) {
 async function userTransfer(req, res, next) {
   try {
     const { transferType, value, values, price, user: userId } = req.body;
-    const parsedValue = parseFloat(value, 10);
+    const parsedValue = parseFloat(value.toFixed(2), 10);
     // const parsedPrice = parseFloat(price, 10);
-    const parsedValues = parseFloat(values, 10);
+    const parsedValues = parseFloat(values.toFixed(2), 10);
     const user = await User.findByPk(userId);
     if (transferType === 'valueToValues') {
       if (user.userType === 'تاجر سوق') {
