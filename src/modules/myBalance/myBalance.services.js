@@ -15,8 +15,8 @@ async function addToBalance(valueToAdd, valuesToAdd) {
   });
   console.log(balance);
 
-  balance.todayValue += valueToAdd;
-  balance.todayValues += valuesToAdd;
+  balance.todayValue += Number(valueToAdd);
+  balance.todayValues += Number(valuesToAdd);
   await balance.save();
   return balance;
 }
@@ -27,8 +27,8 @@ async function subtractFromBalance(valueToSubtract, valuesToSubtract) {
     },
   });
 
-  balance.todayValue -= valueToSubtract;
-  balance.todayValues -= valuesToSubtract;
+  balance.todayValue -= Number(valueToSubtract);
+  balance.todayValues -= Number(valuesToSubtract);
   await balance.save();
   return balance;
 }

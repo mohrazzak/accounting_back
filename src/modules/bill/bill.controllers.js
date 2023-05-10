@@ -383,9 +383,9 @@ async function deleteBillItem(req, res, next) {
 async function transfer(req, res, next) {
   try {
     const { transferType, value, values, price } = req.body;
-    const parsedValue = parseFloat(value, 10).toFixed(2);
-    const parsedPrice = parseFloat(price, 10).toFixed(2);
-    const parsedValues = parseFloat(values, 10).toFixed(2);
+    const parsedValue = Number(parseFloat(value, 10).toFixed(2));
+    const parsedPrice = Number(parseFloat(price, 10).toFixed(2));
+    const parsedValues = Number(parseFloat(values, 10).toFixed(2));
     let firstBill;
     let secondBill;
     if (transferType === 'valueToValues') {
