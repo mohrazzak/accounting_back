@@ -46,7 +46,7 @@ async function getAllDailyBills(req, res, next) {
       where: whereClause,
       include: [{ model: User }],
     });
-console.log(bills?.toJSON());
+console.log(bills?.length);
     let balance;
     if (today.isAfter(selectedDay)) balance = await getPrevBalance(selectedDay);
     else balance = await getBalance(selectedDay);
