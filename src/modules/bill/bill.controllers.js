@@ -433,10 +433,21 @@ async function transfer(req, res, next) {
 async function userTransfer(req, res, next) {
   try {
     const { transferType, value, values, price, user: userId } = req.body;
-    const parsedValue = parseFloat(value, 10).toFixed(2);
+    const parsedValue = Number(parseFloat(value, 10).toFixed(2));
     // const parsedPrice = parseFloat(price, 10);
-    const parsedValues = parseFloat(values, 10).toFixed(2);
+    const parsedValues = Number(parseFloat(values, 10).toFixed(2));
+    console.log(typeof parsedValues);
     const user = await User.findByPk(userId);
+    console.log(
+      'Before accountBalance',
+      user.accountBalance,
+      typeof user.accountBalance
+    );
+    console.log(
+      'Before accountBalanceValues',
+      user.accountBalanceValues,
+      typeof user.accountBalanceValues
+    );
     if (transferType === 'valueToValues') {
       user.accountBalance -= parsedValue;
       user.accountBalanceValues += parsedValues;
@@ -445,6 +456,16 @@ async function userTransfer(req, res, next) {
       user.accountBalance += parsedValue;
       user.accountBalanceValues -= parsedValues;
     }
+    console.log(
+      'After accountBalance',
+      user.accountBalance,
+      typeof user.accountBalance
+    );
+    console.log(
+      'After accountBalanceValues',
+      user.accountBalanceValues,
+      typeof user.accountBalanceValues
+    );
     await user.save();
     responser(res, StatusCodes.OK);
   } catch (error) {
