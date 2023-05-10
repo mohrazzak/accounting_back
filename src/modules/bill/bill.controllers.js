@@ -440,8 +440,6 @@ async function userTransfer(req, res, next) {
     if (transferType === 'valueToValues') {
       user.accountBalance -= parsedValue;
       user.accountBalanceValues += parsedValues;
-
-      await user.save();
     } else {
       // eslint-disable-next-line no-lonely-if
       user.accountBalance += parsedValue;
