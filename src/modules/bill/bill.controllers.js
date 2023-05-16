@@ -449,12 +449,22 @@ async function userTransfer(req, res, next) {
       typeof user.accountBalanceValues
     );
     if (transferType === 'valueToValues') {
-      user.accountBalance -= parsedValue;
-      user.accountBalanceValues += parsedValues;
+      if (user.userType === 'تاجر سوق') {
+        user.accountBalance += parsedValue;
+        user.accountBalanceValues -= parsedValues;
+      } else {
+        user.accountBalance -= parsedValue;
+        user.accountBalanceValues += parsedValues;
+      }
     } else {
       // eslint-disable-next-line no-lonely-if
-      user.accountBalance += parsedValue;
-      user.accountBalanceValues -= parsedValues;
+      if (user.userType === 'تاجر سوق') {
+        user.accountBalance -= parsedValue;
+        user.accountBalanceValues += parsedValues;
+      } else {
+        user.accountBalance += parsedValue;
+        user.accountBalanceValues -= parsedValues;
+      }
     }
     console.log(
       'After accountBalance',

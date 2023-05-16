@@ -46,7 +46,7 @@ async function getAllDailyBills(req, res, next) {
       where: whereClause,
       include: [{ model: User }],
     });
-console.log(bills?.length);
+    console.log(bills?.length);
     let balance;
     if (today.isAfter(selectedDay)) balance = await getPrevBalance(selectedDay);
     else balance = await getBalance(selectedDay);
@@ -119,8 +119,8 @@ async function addDailyBill(req, res, next) {
 
     if (billType === 'ادخال') {
       if (isDaily) await addToBalance(value, values);
-      user.accountBalance += value;
-      user.accountBalanceValues += values;
+      user.accountBalance += Number(value);
+      user.accountBalanceValues += Number(values);
     } else {
       if (isDaily) await subtractFromBalance(value, values);
       user.accountBalance -= value;
@@ -166,8 +166,8 @@ async function editDailyBill(req, res, next) {
 
       await addToBalance(value, values);
 
-      newUser.accountBalance += value;
-      newUser.accountBalanceValues += values;
+      newUser.accountBalance += Number(value);
+      newUser.accountBalanceValues += Number(values);
     } else {
       await addToBalance(bill.value, bill.values);
       newUser.accountBalance += bill.value;
