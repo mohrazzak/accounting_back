@@ -21,8 +21,8 @@ module.exports = (db, DataTypes) => {
     { timestamps: false }
   );
 
-  Product.associations = function associations(models) {
-    Product.hasOne(models.BillItem);
-  };
+  // Product.associations = function associations(models) {
+  //   Product.hasOne(models.BillItem);
+  // };
   return Product;
 };

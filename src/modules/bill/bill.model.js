@@ -14,9 +14,9 @@ module.exports = (db, DataTypes) => {
     },
     { timestamps: false }
   );
-  Bill.associations = function associations(models) {
-    Bill.hasMany(models.BillItem);
-    Bill.belongsTo(models.User);
-  };
+  // Bill.associations = function associations(models) {
+  //   Bill.hasMany(models.BillItem);
+  //   Bill.belongsTo(models.User);
+  // };
   return Bill;
 };
