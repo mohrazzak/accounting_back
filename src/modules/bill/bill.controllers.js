@@ -1,20 +1,18 @@
 const { StatusCodes } = require('http-status-codes');
 const { responser } = require('../../utils');
 const { ApiError } = require('../../utils/errors');
-const { Bill } = require('./bill.model');
-const { BillItem } = require('../bill_item/bill_item.model');
-const { Product, User } = require('../../config/db');
 
 const {
   addToBalance,
   subtractFromBalance,
 } = require('../myBalance/myBalance.services');
+const { db } = require('../../config');
 
 async function getAllBills(req, res, next) {
   try {
     const { billType } = req.query;
-    const bills = await Bill.findAll({
-      include: BillItem,
+    const bills = await db.Bill.findAll({
+      include: db.BillItem,
       where: billType ? { billType } : null,
     });
     return responser(res, StatusCodes.ACCEPTED, { bills });
@@ -26,9 +24,9 @@ async function getAllBills(req, res, next) {
 async function getBill(req, res, next) {
   try {
     const { billId } = req.params;
-    const bill = await Bill.findByPk(billId, {
+    const bill = await db.Bill.findByPk(billId, {
       include: [
-        { model: BillItem, include: [{ model: Product }] }, // Include Product model with BillItem model
+        { model: db.BillItem, include: [{ model: db.Product }] }, // Include Product model with BillItem model
       ],
     });
     if (!bill) throw new ApiError('فاتورة غير موجودة', StatusCodes.NOT_FOUND);
@@ -41,7 +39,7 @@ async function getBill(req, res, next) {
 async function addBill(req, res, next) {
   try {
     const { values, value, billType, note, products } = req.body;
-    const bill = await Bill.create({
+    const bill = await db.Bill.create({
       values,
       value,
       billType,
@@ -53,13 +51,13 @@ async function addBill(req, res, next) {
       BillId: bill.id,
     }));
 
-    const billItems = await BillItem.bulkCreate(productsWithBill);
+    const billItems = await db.BillItem.bulkCreate(productsWithBill);
 
     if (!bill) throw new ApiError('تعذر انشاء الفاتورة', StatusCodes.NOT_FOUND);
 
     await bill.setBillItems(billItems);
 
-    const result = await Bill.findByPk(bill.id, { include: BillItem });
+    const result = await db.Bill.findByPk(bill.id, { include: db.BillItem });
     return responser(res, StatusCodes.CREATED, { bill: result });
   } catch (error) {
     return next(error);
@@ -71,7 +69,7 @@ async function editBill(req, res, next) {
     const { billId } = req.params;
     const { values, value, billType, note, billItems } = req.body;
 
-    const bill = await Bill.findByPk(billId);
+    const bill = await db.Bill.findByPk(billId);
 
     if (!bill) throw new ApiError('الفاتورة غير موجودة', StatusCodes.NOT_FOUND);
 
@@ -98,7 +96,7 @@ async function editBill(req, res, next) {
         } = billItem;
 
         // Find the existing BillItem record by id
-        const existingBillItem = await BillItem.findByPk(billItemId);
+        const existingBillItem = await db.BillItem.findByPk(billItemId);
 
         // If the BillItem record does not exist, return null
         if (!existingBillItem) {
@@ -139,10 +137,10 @@ async function deleteBill(req, res, next) {
     const { billId } = req.params;
 
     // Delete the associated BillItems first
-    await BillItem.destroy({ where: { BillId: billId } });
+    await db.BillItem.destroy({ where: { BillId: billId } });
 
     // Delete the Bill
-    const deletedBill = await Bill.destroy({ where: { id: billId } });
+    const deletedBill = await db.Bill.destroy({ where: { id: billId } });
 
     if (!deletedBill)
       throw new ApiError('تعذر حذف الفاتورة', StatusCodes.NOT_FOUND);
@@ -157,9 +155,9 @@ async function addBillItem(req, res, next) {
   try {
     const { billId } = req.params;
     const { values, value, billType, note, ProductId, count } = req.body;
-    const product = await Product.findByPk(ProductId);
+    const product = await db.Product.findByPk(ProductId);
 
-    const bill = await Bill.findByPk(billId);
+    const bill = await db.Bill.findByPk(billId);
     if (count > product.count && bill.billType === 'صادر')
       throw new ApiError(`
          ,يرجى تحديد كمية أقل أو تساوي كمية المستودع
@@ -171,7 +169,7 @@ async function addBillItem(req, res, next) {
     else product.count += count;
     const valueToAdd = value * count;
     const valuesToAdd = values * count;
-    const user = await User.findByPk(bill.UserId);
+    const user = await db.User.findByPk(bill.UserId);
     if (
       (bill.billType === 'ادخال' && user.userType === 'تاجر سوق') ||
       (bill.billType === 'صادر' && user.userType === 'زبون')
@@ -200,7 +198,7 @@ async function addBillItem(req, res, next) {
     await user.save();
     await product.save();
 
-    const createdBillItem = await BillItem.create({
+    const createdBillItem = await db.BillItem.create({
       values,
       value,
       billType,
@@ -209,8 +207,8 @@ async function addBillItem(req, res, next) {
       ProductId,
       BillId: billId,
     });
-    const billItem = await BillItem.findByPk(createdBillItem.id, {
-      include: [{ model: Product }],
+    const billItem = await db.BillItem.findByPk(createdBillItem.id, {
+      include: [{ model: db.Product }],
     });
     return responser(res, StatusCodes.CREATED, { billItem });
   } catch (error) {
@@ -223,9 +221,9 @@ async function editBillItem(req, res, next) {
     const { billId } = req.params;
     const { values, value, billType, note, id, count } = req.body;
 
-    const oldBillItem = await BillItem.findByPk(id);
-    const product = await Product.findByPk(oldBillItem.ProductId);
-    const bill = await Bill.findByPk(billId);
+    const oldBillItem = await db.BillItem.findByPk(id);
+    const product = await db.Product.findByPk(oldBillItem.ProductId);
+    const bill = await db.Bill.findByPk(billId);
     if (bill.billType === 'صادر') {
       product.count += oldBillItem.count;
       product.count -= count;
@@ -242,7 +240,7 @@ async function editBillItem(req, res, next) {
         عدد ${product.count} فقط
             `);
 
-    const updatedBillItem = await BillItem.update(
+    const updatedBillItem = await db.BillItem.update(
       {
         values,
         value,
@@ -258,7 +256,7 @@ async function editBillItem(req, res, next) {
 
     const valueToSubtract = oldBillItem.value * oldBillItem.count;
     const valuesToSubtract = oldBillItem.values * oldBillItem.count;
-    const user = await User.findByPk(bill.UserId);
+    const user = await db.User.findByPk(bill.UserId);
     if (
       (bill.billType === 'ادخال' && user.userType === 'تاجر سوق') ||
       (bill.billType === 'صادر' && user.userType === 'زبون')
@@ -310,8 +308,8 @@ async function editBillItem(req, res, next) {
     await user.save();
     await product.save();
 
-    const billItem = await BillItem.findByPk(updatedBillItem.id, {
-      include: [{ model: Product }],
+    const billItem = await db.BillItem.findByPk(updatedBillItem.id, {
+      include: [{ model: db.Product }],
     });
     return responser(res, StatusCodes.CREATED, { billItem });
   } catch (error) {
@@ -322,10 +320,10 @@ async function editBillItem(req, res, next) {
 async function deleteBillItem(req, res, next) {
   try {
     const { billId, billItemId } = req.params;
-    const billItem = await BillItem.findByPk(billItemId);
-    const product = await Product.findByPk(billItem.ProductId);
-    const bill = await Bill.findByPk(billId);
-    const user = await User.findByPk(bill.UserId);
+    const billItem = await db.BillItem.findByPk(billItemId);
+    const product = await db.Product.findByPk(billItem.ProductId);
+    const bill = await db.Bill.findByPk(billId);
+    const user = await db.User.findByPk(bill.UserId);
     const valueToAdd = billItem.value * billItem.count;
     const valuesToAdd = billItem.values * billItem.count;
 
@@ -394,13 +392,13 @@ async function transfer(req, res, next) {
       // 100 دولار تحويل
       // نقصني السعر بالدولار
       // زادني المبلغ
-      firstBill = await Bill.create({
+      firstBill = await db.Bill.create({
         value: parsedValue,
         values: 0,
         billType: 'صادر',
         note: ` مبيع قيمة بسعر ${parsedPrice}`,
       });
-      secondBill = await Bill.create({
+      secondBill = await db.Bill.create({
         value: 0,
         values: parsedValues,
         billType: 'ادخال',
@@ -409,13 +407,13 @@ async function transfer(req, res, next) {
       await addToBalance(0, parsedValues);
       await subtractFromBalance(parsedValue, 0);
     } else {
-      firstBill = await Bill.create({
+      firstBill = await db.Bill.create({
         values: parsedValues,
         value: 0,
         billType: 'صادر',
         note: ` مبيع قيمة بسعر ${parsedPrice}`,
       });
-      secondBill = await Bill.create({
+      secondBill = await db.Bill.create({
         value: parsedValue,
         values: 0,
         billType: 'ادخال',
@@ -437,7 +435,7 @@ async function userTransfer(req, res, next) {
     // const parsedPrice = parseFloat(price, 10);
     const parsedValues = Number(parseFloat(values, 10).toFixed(2));
     console.log(typeof parsedValues);
-    const user = await User.findByPk(userId);
+    const user = await db.User.findByPk(userId);
     console.log(
       'Before accountBalance',
       user.accountBalance,

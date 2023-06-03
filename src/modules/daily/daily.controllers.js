@@ -9,7 +9,6 @@ const {
   addToBalance,
   getPrevBalance,
 } = require('../myBalance/myBalance.services');
-const { User, BillItem, Bill, Product } = require('../../config/db');
 const { db } = require('../../config');
 
 async function getAllDailyBills(req, res, next) {
@@ -41,7 +40,7 @@ async function getAllDailyBills(req, res, next) {
     console.log(whereClause);
     const bills = await db.Bill.findAll({
       where: whereClause,
-      include: [{ model: db.User }],
+      include: [db.User],
     });
     console.log(bills?.length);
     let balance;
@@ -69,7 +68,7 @@ async function addDailyBill(req, res, next) {
       products,
       isDaily = true,
     } = req.body;
-    const createdBill = await Bill.create({
+    const createdBill = await db.Bill.create({
       UserId: userId,
       value,
       values,
@@ -82,7 +81,7 @@ async function addDailyBill(req, res, next) {
       const productsWithBill = [];
       // eslint-disable-next-line no-restricted-syntax
       for (const product of products) {
-        const productInStorage = await Product.findByPk(product.ProductId);
+        const productInStorage = await db.Product.findByPk(product.ProductId);
         if (billType === 'صادر' && product?.count > productInStorage?.count) {
           throw new ApiError(`
     ,يرجى تحديد كمية أقل أو تساوي كمية المستودع
@@ -103,13 +102,13 @@ async function addDailyBill(req, res, next) {
         });
       }
 
-      const billItems = await BillItem.bulkCreate(productsWithBill);
+      const billItems = await db.BillItem.bulkCreate(productsWithBill);
       await createdBill.setBillItems(billItems);
     }
 
-    const user = await User.findByPk(userId);
-    const bill = await Bill.findByPk(createdBill.id, {
-      include: [{ model: User }],
+    const user = await db.User.findByPk(userId);
+    const bill = await db.Bill.findByPk(createdBill.id, {
+      include: [db.User],
     });
     if (!bill || !user)
       throw new ApiError('تعذر انشاء الفاتورة', StatusCodes.BAD_REQUEST);
@@ -134,13 +133,13 @@ async function editDailyBill(req, res, next) {
   try {
     const { billId } = req.params;
     const { userId, value, values, billType, note } = req.body;
-    const bill = await Bill.findByPk(billId, { include: [User] });
+    const bill = await db.Bill.findByPk(billId, { include: [db.User] });
     if (!bill) {
       throw new ApiError('الفاتورة غير موجودة', StatusCodes.NOT_FOUND);
     }
 
     const oldUser = bill.User;
-    const newUser = await User.findByPk(userId);
+    const newUser = await db.User.findByPk(userId);
     if (!newUser) {
       throw new ApiError('المستخدم غير موجود', StatusCodes.NOT_FOUND);
     }
@@ -178,7 +177,7 @@ async function editDailyBill(req, res, next) {
     // Update the bill with the new information
     await newUser.save();
     await bill.update({ value, values, note });
-    const updatedBill = await Bill.findByPk(bill.id, { include: [User] });
+    const updatedBill = await db.Bill.findByPk(bill.id, { include: [db.User] });
 
     const balance = await getBalance();
     responser(res, StatusCodes.OK, { bill: updatedBill, balance });
@@ -190,13 +189,13 @@ async function editDailyBill(req, res, next) {
 async function deleteDailyBill(req, res, next) {
   try {
     const { billId } = req.params;
-    const bill = await Bill.findByPk(billId);
-    const user = await User.findByPk(bill.UserId);
+    const bill = await db.Bill.findByPk(billId);
+    const user = await db.User.findByPk(bill.UserId);
     if (!bill) throw new ApiError('الفاتورة غير موجودة', StatusCodes.NOT_FOUND);
-    const billItems = await BillItem.findAll({ where: { BillId: bill.id } });
+    const billItems = await db.BillItem.findAll({ where: { BillId: bill.id } });
     // eslint-disable-next-line no-restricted-syntax
     for (const billItem of billItems) {
-      const productInStorage = await Product.findByPk(billItem.ProductId);
+      const productInStorage = await db.Product.findByPk(billItem.ProductId);
       let editedCount = 0;
       if (bill.billType === 'صادر') editedCount += billItem.count;
       else editedCount -= billItem.count;

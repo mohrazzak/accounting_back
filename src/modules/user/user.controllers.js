@@ -6,11 +6,11 @@ const {
   addToBalance,
   subtractFromBalance,
 } = require('../myBalance/myBalance.services');
-const { User, Bill, BillItem } = require('../../config/db');
+const { db } = require('../../config');
 
 async function getAllUsers(req, res, next) {
   try {
-    const users = await User.findAll();
+    const users = await db.User.findAll();
     return responser(res, StatusCodes.ACCEPTED, { users });
   } catch (error) {
     return next(error);
@@ -20,10 +20,10 @@ async function getAllUsers(req, res, next) {
 async function getUser(req, res, next) {
   try {
     const { userId } = req.params;
-    const user = await User.findByPk(userId);
+    const user = await db.User.findByPk(userId);
     const whereClause = {};
     if (user?.id) whereClause.UserId = user.id;
-    const bills = await Bill.findAll({ where: whereClause });
+    const bills = await db.Bill.findAll({ where: whereClause });
     if (!user) throw new ApiError('المستخدم غير موجود', StatusCodes.NOT_FOUND);
     return responser(res, StatusCodes.ACCEPTED, { user, bills });
   } catch (error) {
@@ -42,7 +42,7 @@ async function addUser(req, res, next) {
       accountBalance,
       accountBalanceValues,
     } = req.body;
-    const user = await User.create({
+    const user = await db.User.create({
       name,
       mobileNumber,
       address,
@@ -70,7 +70,7 @@ async function editUser(req, res, next) {
       accountBalanceValues,
     } = req.body;
     const { userId } = req.params;
-    const user = await User.findByPk(userId);
+    const user = await db.User.findByPk(userId);
 
     if (!user) throw new ApiError('المستخدم غير موجود', StatusCodes.NOT_FOUND);
     const updatedUser = await user.update({
@@ -93,7 +93,7 @@ async function editUser(req, res, next) {
 async function deleteUser(req, res, next) {
   try {
     const { userId } = req.params;
-    const user = await User.findByPk(userId);
+    const user = await db.User.findByPk(userId);
     await user.destroy();
     if (!user) throw new ApiError('تعذر حذف المستخدم', StatusCodes.NOT_FOUND);
     return responser(res, StatusCodes.ACCEPTED, { user });
@@ -105,7 +105,7 @@ async function deleteUser(req, res, next) {
 async function getUserBill(req, res, next) {
   try {
     const { userId, billId } = req.params;
-    const bills = await BillItem.findAll({ where: { BillId: billId } });
+    const bills = await db.BillItem.findAll({ where: { BillId: billId } });
   } catch (error) {
     next(error);
   }
@@ -115,7 +115,7 @@ async function addUserBill(req, res, next) {
   try {
     const { userId } = req.params;
     const { products, billType } = req.body;
-    const bill = Bill.build({
+    const bill = db.Bill.build({
       value: 0,
       values: 0,
       UserId: userId,
@@ -126,7 +126,7 @@ async function addUserBill(req, res, next) {
     // eslint-disable-next-line no-restricted-syntax
     for (const product of products) {
       // eslint-disable-next-line no-await-in-loop
-      const billItem = await BillItem.create({
+      const billItem = await db.BillItem.create({
         count: product.count,
         value: product.value,
         values: product.values,

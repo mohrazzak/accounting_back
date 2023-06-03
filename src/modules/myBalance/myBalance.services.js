@@ -2,12 +2,12 @@
 /* eslint-disable no-restricted-syntax */
 const { Op, Sequelize } = require('sequelize');
 const moment = require('moment');
-const { MyBalance } = require('../../config/db');
+const { db } = require('../../config');
 
 const today = moment().local().startOf('day').add(3, 'hours');
 
 async function addToBalance(valueToAdd, valuesToAdd) {
-  const balance = await MyBalance.findOne({
+  const balance = await db.MyBalance.findOne({
     where: {
       createdAt: today.format('YYYY-MM-DD'),
     },
@@ -20,7 +20,7 @@ async function addToBalance(valueToAdd, valuesToAdd) {
   return balance;
 }
 async function subtractFromBalance(valueToSubtract, valuesToSubtract) {
-  const balance = await MyBalance.findOne({
+  const balance = await db.MyBalance.findOne({
     where: {
       createdAt: today.format('YYYY-MM-DD'),
     },
@@ -35,7 +35,7 @@ async function subtractFromBalance(valueToSubtract, valuesToSubtract) {
 async function getBalance(selectedDay) {
   // IF BALANCE EXISTS RETURN IT
   // ELSE CREATE ONE WITH LATEST BALANCE VALUES
-  const balance = await MyBalance.findOne({
+  const balance = await db.MyBalance.findOne({
     where: {
       createdAt: selectedDay.toDate(),
     },
@@ -52,7 +52,7 @@ async function getBalance(selectedDay) {
       },
     };
 
-  const prevBalance = await MyBalance.findOne({
+  const prevBalance = await db.MyBalance.findOne({
     where: {
       createdAt: {
         [Op.lt]: selectedDay.toDate(),
@@ -62,7 +62,7 @@ async function getBalance(selectedDay) {
   });
 
   if (today.isSame(selectedDay))
-    await MyBalance.create({
+    await db.MyBalance.create({
       todayValue: 0,
       todayValues: 0,
       yesterdayValue: prevBalance.yesterdayValue + prevBalance.todayValue,
@@ -83,7 +83,7 @@ async function getBalance(selectedDay) {
 }
 
 async function getPrevBalance(selectedDay) {
-  const existingBalance = await MyBalance.findOne({
+  const existingBalance = await db.MyBalance.findOne({
     where: {
       createdAt: selectedDay.toDate(),
     },
@@ -100,7 +100,7 @@ async function getPrevBalance(selectedDay) {
       },
     };
 
-  const prevBalance = await MyBalance.findOne({
+  const prevBalance = await db.MyBalance.findOne({
     where: {
       createdAt: {
         [Op.lt]: selectedDay.toDate(),
