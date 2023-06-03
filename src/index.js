@@ -34,7 +34,7 @@ const sessionOptions = {
     maxAge: 3600000,
   },
 };
-app.use(session(sessionOptions));
+// app.use(session(sessionOptions));
 
 app.use(morgan('dev'));
 console.log(NODE_ENV === 'production' ? PRO_URL : LOCAL_URL);
