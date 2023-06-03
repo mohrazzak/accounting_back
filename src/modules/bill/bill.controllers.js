@@ -3,12 +3,12 @@ const { responser } = require('../../utils');
 const { ApiError } = require('../../utils/errors');
 const { Bill } = require('./bill.model');
 const { BillItem } = require('../bill_item/bill_item.model');
-const { Product } = require('../product/product.model');
+const { Product, User } = require('../../config/db');
+
 const {
   addToBalance,
   subtractFromBalance,
 } = require('../myBalance/myBalance.services');
-const { User } = require('../user/user.model');
 
 async function getAllBills(req, res, next) {
   try {

@@ -1,8 +1,6 @@
 /* eslint-disable no-await-in-loop */
 const { StatusCodes } = require('http-status-codes');
-const { Op } = require('sequelize');
 const moment = require('moment');
-const { Bill } = require('../bill/bill.model');
 const { responser } = require('../../utils');
 const { ApiError } = require('../../utils/errors');
 const {
@@ -11,9 +9,7 @@ const {
   addToBalance,
   getPrevBalance,
 } = require('../myBalance/myBalance.services');
-const { User } = require('../user/user.model');
-const { BillItem } = require('../bill_item/bill_item.model');
-const { Product } = require('../product/product.model');
+const { User, BillItem, Bill, Product } = require('../../config/db');
 
 async function getAllDailyBills(req, res, next) {
   const { all, userId, isDaily, billType, day, year, month } = req.query;

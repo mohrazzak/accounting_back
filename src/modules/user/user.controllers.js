@@ -1,14 +1,12 @@
 const { StatusCodes } = require('http-status-codes');
 const { responser } = require('../../utils');
 const { ApiError } = require('../../utils/errors');
-const { Bill } = require('../bill/bill.model');
-const { BillItem } = require('../bill_item/bill_item.model');
+
 const {
   addToBalance,
   subtractFromBalance,
 } = require('../myBalance/myBalance.services');
-const { Product } = require('../product/product.model');
-const { User } = require('./user.model');
+const { User, Bill, BillItem } = require('../../config/db');
 
 async function getAllUsers(req, res, next) {
   try {

@@ -1,7 +1,7 @@
 const { StatusCodes } = require('http-status-codes');
 const { responser } = require('../../utils');
 const { ApiError } = require('../../utils/errors');
-const { Product } = require('./product.model');
+const { Product } = require('../../config/db');
 
 async function getAllProducts(req, res, next) {
   try {

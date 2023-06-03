@@ -2,8 +2,7 @@
 /* eslint-disable no-restricted-syntax */
 const { Op, Sequelize } = require('sequelize');
 const moment = require('moment');
-const { Bill } = require('../bill/bill.model');
-const { MyBalance } = require('./MyBalance.model');
+const { MyBalance } = require('../../config/db');
 
 const today = moment().local().startOf('day').add(3, 'hours');
 

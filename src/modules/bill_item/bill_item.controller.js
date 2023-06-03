@@ -2,7 +2,7 @@ const { StatusCodes } = require('http-status-codes');
 const { responser } = require('../../utils');
 const { ApiError } = require('../../utils/errors');
 const { BillItem } = require('./bill_item.model');
-const { Product } = require('../product/product.model');
+const { Product } = require('../../config/db');
 
 async function getAllBillItems(req, res, next) {
   try {
