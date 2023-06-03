@@ -21,7 +21,7 @@ const app = express();
 app.use(
   cors({
     origin: 'https://accounting-as.web.app',
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'OPTION'],
     credentials: true,
   })
 );
