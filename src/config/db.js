@@ -28,10 +28,16 @@ const dbInitialize = async () => {
     await db.authenticate();
     console.info('Connected to the DB.');
 
-    User.associations({ Bill: BillModel(db, DataTypes) });
-    Bill.associations({ User: UserModel(db, DataTypes), BillItem });
-    BillItem.associations({ Product, Bill });
-    Product.associations({ BillItem });
+    // User.associations({ Bill: BillModel(db, DataTypes) });
+    // Bill.associations({ User: UserModel(db, DataTypes), BillItem });
+    // BillItem.associations({ Product, Bill });
+    // Product.associations({ BillItem });
+    Bill.hasMany(BillItem);
+    Bill.belongsTo(User);
+    BillItem.belongsTo(Product);
+    Product.hasOne(BillItem);
+    BillItem.belongsTo(Bill);
+    User.hasMany(Bill);
 
     await db.sync();
   } catch (error) {
