@@ -39,18 +39,11 @@ app.use(session(sessionOptions));
 app.use(morgan('dev'));
 console.log(NODE_ENV === 'production' ? PRO_URL : LOCAL_URL);
 const corsOptions = {
-  credentials: true,
+  // credentials: true,
   origin: 'https://accounting-as.web.app',
-  allowedHeaders: [
-    'Content-Type',
-    'Authorization',
-    'Access-Control-Allow-Origin',
-  ],
 };
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  next();
-});
+app.use(cors(corsOptions));
+
 app.use(routes);
 
 // error handler
