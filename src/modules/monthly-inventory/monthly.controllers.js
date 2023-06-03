@@ -2,7 +2,6 @@
 const { StatusCodes } = require('http-status-codes');
 
 const { Op, Sequelize } = require('sequelize');
-const { Bill } = require('../bill/bill.model');
 const { responser } = require('../../utils');
 const { ApiError } = require('../../utils/errors');
 const {
@@ -10,6 +9,7 @@ const {
   subtractFromBalance,
   addToBalance,
 } = require('../myBalance/myBalance.services');
+const { db } = require('../../config');
 
 const billTypes = ['ادخال', 'صادر', 'مصروف', 'سحوبات'];
 
@@ -69,7 +69,7 @@ async function getMonthly(req, res, next) {
 
     const monthly = await Promise.all(
       [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(async (currentMonth) => {
-        const billsByMonth = await Bill.findAll({
+        const billsByMonth = await db.Bill.findAll({
           attributes: [
             'UserId',
             'billType', // Group by billType
@@ -97,7 +97,7 @@ async function getMonthly(req, res, next) {
           raw: true,
         });
 
-        const transformingBills = await Bill.findAll({
+        const transformingBills = await db.Bill.findAll({
           attributes: [
             'billType', // Group by billType
             [Sequelize.literal('MONTH("createdAt")'), 'month'], // Extract month from createdAt
