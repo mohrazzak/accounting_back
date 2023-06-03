@@ -47,7 +47,7 @@ const corsOptions = {
     'Access-Control-Allow-Origin',
   ],
 };
-app.use(cors(corsOptions));
+app.use(cors());
 
 app.use(routes);
 
