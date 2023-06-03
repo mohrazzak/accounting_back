@@ -10,6 +10,7 @@ const {
   getPrevBalance,
 } = require('../myBalance/myBalance.services');
 const { User, BillItem, Bill, Product } = require('../../config/db');
+const { db } = require('../../config');
 
 async function getAllDailyBills(req, res, next) {
   const { all, userId, isDaily, billType, day, year, month } = req.query;
@@ -38,9 +39,9 @@ async function getAllDailyBills(req, res, next) {
       whereClause.isDaily = true;
     }
     console.log(whereClause);
-    const bills = await Bill.findAll({
+    const bills = await db.Bill.findAll({
       where: whereClause,
-      include: [{ model: User }],
+      include: [{ model: db.User }],
     });
     console.log(bills?.length);
     let balance;
