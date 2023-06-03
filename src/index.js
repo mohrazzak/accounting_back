@@ -48,14 +48,9 @@ const corsOptions = {
   ],
 };
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', 'https://accounting-as.web.app');
-  res.header(
-    'Access-Control-Allow-Headers',
-    'Origin, X-Requested-With, Content-Type, Accept'
-  );
+  res.header('Access-Control-Allow-Origin', '*');
   next();
 });
-
 app.use(routes);
 
 // error handler
