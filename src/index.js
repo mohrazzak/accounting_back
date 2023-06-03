@@ -20,8 +20,9 @@ const { dbInitialize } = require('./config/db');
 const app = express();
 app.use(
   cors({
-    origin: '*',
-    allowedHeaders: ['Content-Type', 'Authorization'],
+    origin: 'https://accounting-as.web.app',
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    credentials: true,
   })
 );
 app.use(express.urlencoded({ extended: false }));
