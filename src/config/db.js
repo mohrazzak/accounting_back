@@ -28,8 +28,8 @@ const dbInitialize = async () => {
     await db.authenticate();
     console.info('Connected to the DB.');
 
-    User.associations({ Bill });
-    Bill.associations({ User, BillItem });
+    User.associations({ Bill: BillModel(db, DataTypes) });
+    Bill.associations({ User: UserModel(db, DataTypes), BillItem });
     BillItem.associations({ Product, Bill });
     Product.associations({ BillItem });
 
