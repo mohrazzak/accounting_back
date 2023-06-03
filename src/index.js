@@ -18,6 +18,12 @@ const {
 const { dbInitialize } = require('./config/db');
 
 const app = express();
+app.use(
+  cors({
+    origin: '*',
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  })
+);
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use(helmet());
@@ -48,7 +54,6 @@ const corsOptions = {
   ],
   exposedHeaders: ['Content-Length', 'X-Foo', 'X-Bar'],
 };
-app.use(cors());
 
 app.use(routes);
 
