@@ -41,6 +41,12 @@ console.log(NODE_ENV === 'production' ? PRO_URL : LOCAL_URL);
 const corsOptions = {
   credentials: true,
   origin: NODE_ENV === 'production' ? PRO_URL : LOCAL_URL,
+  allowedHeaders: [
+    'Content-Type',
+    'Authorization',
+    'Access-Control-Allow-Origin',
+  ],
+  exposedHeaders: ['Content-Length', 'X-Foo', 'X-Bar'],
 };
 app.use(cors(corsOptions));
 
