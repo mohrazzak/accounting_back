@@ -39,7 +39,7 @@ const dbInitialize = async () => {
     BillItem.belongsTo(Bill);
     User.hasMany(Bill);
 
-    await db.sync();
+    // await db.sync();
   } catch (error) {
     console.error('Failed to connect with the DB: ', error);
   }
