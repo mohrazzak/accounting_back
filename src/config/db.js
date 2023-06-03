@@ -28,10 +28,10 @@ const dbInitialize = async () => {
     await db.authenticate();
     console.info('Connected to the DB.');
 
-    await User.associations({ Bill });
-    await Bill.associations({ User, BillItem });
-    await BillItem.associations({ Product, Bill });
-    await Product.associations({ BillItem });
+    User.associations({ Bill });
+    Bill.associations({ User, BillItem });
+    BillItem.associations({ Product, Bill });
+    Product.associations({ BillItem });
 
     await db.sync();
   } catch (error) {
