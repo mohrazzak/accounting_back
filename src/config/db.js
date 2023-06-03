@@ -4,16 +4,10 @@ const { Sequelize } = require('sequelize');
 const { DB_URL } = require('./constants');
 
 const db = new Sequelize(DB_URL, {
-  // dialectOptions: {
-  //   ssl: {
-  //     require: true,
-  //     rejectUnauthorized: false, // You may need to set this to false if you're using a self-signed certificate
-  //   },
-  // },
   logging: false,
 });
 
-(async () => {
+const dbInitialize = async () => {
   try {
     await db.authenticate();
     console.info('Connected to the DB.');
@@ -36,6 +30,6 @@ const db = new Sequelize(DB_URL, {
   } catch (error) {
     console.error('Failed to connect with the DB: ', error);
   }
-})();
+};
 
-module.exports = db;
+module.exports = { db, dbInitialize };

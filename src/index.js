@@ -15,31 +15,23 @@ const {
   LOCAL_URL,
   PRO_URL,
 } = require('./config/constants');
+const { dbInitialize } = require('./config/db');
 
 const app = express();
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use(helmet());
 
-const sessionConfig = {
+const sessionOptions = {
   secret: tokenSecret,
   keys: [tokenSecret],
-  cookie: {
-    maxAge: 1000 * 60 * 60 * 1,
-  },
-  resave: true,
-  saveUninitialized: true,
-};
-const sessionOptions = {
-  secret: tokenSecret, // Replace with your own secret key
-  keys: [tokenSecret], // Replace with your own secret key
   resave: false,
   saveUninitialized: false,
   cookie: {
-    secure: true, // Set to true if your site uses HTTPS
-    httpOnly: true, // Prevent client-side JavaScript from accessing the cookie
-    sameSite: 'none', // Set to "none" if using cross-site requests (e.g., with CORS)
-    maxAge: 3600000, // Set the maximum age of the cookie (in milliseconds) to 1 hour
+    secure: true,
+    httpOnly: true,
+    sameSite: 'none',
+    maxAge: 3600000,
   },
 };
 app.use(session(sessionOptions));
@@ -75,6 +67,7 @@ process.on('uncaughtException', (error) => {
 });
 
 const PORT = process.env.SERVER_PORT || 3000;
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
+  await dbInitialize();
   console.log(`Server is running on port ${PORT}`);
 });
