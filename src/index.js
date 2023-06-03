@@ -48,7 +48,7 @@ const corsOptions = {
   ],
   exposedHeaders: ['Content-Length', 'X-Foo', 'X-Bar'],
 };
-app.use(cors(corsOptions));
+app.use(cors());
 
 app.use(routes);
 
