@@ -19,7 +19,7 @@ async function login(req, res, next) {
 
 async function logout(req, res, next) {
   try {
-    req.session = null;
+    // req.session = null;
     return responser(res, StatusCodes.ACCEPTED);
   } catch (error) {
     return next(error);

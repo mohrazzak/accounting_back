@@ -40,7 +40,7 @@ async function getAllDailyBills(req, res, next) {
     console.log(whereClause);
     const bills = await db.Bill.findAll({
       where: whereClause,
-      include: [db.User],
+      include: db.User,
     });
     console.log(bills?.length);
     let balance;
