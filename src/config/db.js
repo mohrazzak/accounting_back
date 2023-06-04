@@ -14,7 +14,7 @@ const UserModel = require('../modules/user/user.model');
 const MyBalanceModel = require('../modules/myBalance/MyBalance.model');
 
 const db = new Sequelize(DB_URL, {
-  logging: true,
+  logging: console.log,
 });
 
 const User = UserModel(db, DataTypes);
