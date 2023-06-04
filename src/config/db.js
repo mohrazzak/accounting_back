@@ -14,7 +14,7 @@ const UserModel = require('../modules/user/user.model');
 const MyBalanceModel = require('../modules/myBalance/MyBalance.model');
 
 const db = new Sequelize(DB_URL, {
-  logging: false,
+  logging: true,
 });
 
 const User = UserModel(db, DataTypes);
@@ -28,10 +28,6 @@ const dbInitialize = async () => {
     await db.authenticate();
     console.info('Connected to the DB.');
 
-    // User.associations({ Bill: BillModel(db, DataTypes) });
-    // Bill.associations({ User: UserModel(db, DataTypes), BillItem });
-    // BillItem.associations({ Product, Bill });
-    // Product.associations({ BillItem });
     Bill.hasMany(BillItem);
     Bill.belongsTo(User);
     BillItem.belongsTo(Product);
@@ -39,7 +35,7 @@ const dbInitialize = async () => {
     BillItem.belongsTo(Bill);
     User.hasMany(Bill);
 
-    // await db.sync();
+    await db.sync();
   } catch (error) {
     console.error('Failed to connect with the DB: ', error);
   }
