@@ -3,15 +3,15 @@ const { Sequelize, DataTypes } = require('sequelize');
 
 const { DB_URL } = require('./constants');
 
-const BillItemModel = require('../modules/bill_item/bill_item.model');
+// const BillItemModel = require('../modules/bill_item/bill_item.model');
 
-const ProductModel = require('../modules/product/product.model');
+// const ProductModel = require('../modules/product/product.model');
 
-const BillModel = require('../modules/bill/bill.model');
+// const BillModel = require('../modules/bill/bill.model');
 
-const UserModel = require('../modules/user/user.model');
+// const UserModel = require('../modules/user/user.model');
 
-const MyBalanceModel = require('../modules/myBalance/MyBalance.model');
+// const MyBalanceModel = require('../modules/myBalance/MyBalance.model');
 
 // const db = new Sequelize(DB_URL, {
 //   logging: false,
@@ -56,11 +56,17 @@ const db = {};
 db.Sequelize = Sequelize;
 db.sequelize = sequelize;
 
-db.BillItem = require('../modules/bill_item/bill_item.model')(sequelize, DataTypes);
+db.BillItem = require('../modules/bill_item/bill_item.model')(
+  sequelize,
+  DataTypes
+);
 db.Product = require('../modules/product/product.model')(sequelize, DataTypes);
 db.Bill = require('../modules/bill/bill.model')(sequelize, DataTypes);
 db.User = require('../modules/user/user.model')(sequelize, DataTypes);
-db.MyBalance = require('../modules/myBalance/MyBalance.model')(sequelize, DataTypes);
+db.MyBalance = require('../modules/myBalance/MyBalance.model')(
+  sequelize,
+  DataTypes
+);
 
 // Define associations
 db.Bill.hasMany(db.BillItem);

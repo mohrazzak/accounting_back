@@ -156,20 +156,20 @@ async function editDailyBill(req, res, next) {
       );
 
     if (bill.billType === 'ادخال') {
-      await subtractFromBalance(bill.value, bill.values);
+      if (bill.isDaily) await subtractFromBalance(bill.value, bill.values);
       newUser.accountBalance -= bill.value;
       newUser.accountBalanceValues -= bill.values;
 
-      await addToBalance(value, values);
+      if (bill.isDaily) await addToBalance(value, values);
 
       newUser.accountBalance += Number(value);
       newUser.accountBalanceValues += Number(values);
     } else {
-      await addToBalance(bill.value, bill.values);
+      if (bill.isDaily) await addToBalance(bill.value, bill.values);
       newUser.accountBalance += bill.value;
       newUser.accountBalanceValues += bill.values;
 
-      await subtractFromBalance(value, values);
+      if (bill.isDaily) await subtractFromBalance(value, values);
       newUser.accountBalance -= value;
       newUser.accountBalanceValues -= values;
     }
@@ -206,16 +206,17 @@ async function deleteDailyBill(req, res, next) {
 
       productInStorage.count += editedCount; // Accumulate count for multiple bill items
       await productInStorage.save();
+      await billItem.destroy();
     }
 
     if (bill.billType === 'ادخال') {
-      await subtractFromBalance(bill.value, bill.values);
+      if (bill.isDaily) await subtractFromBalance(bill.value, bill.values);
       if (user) {
         user.accountBalance -= bill.value;
         user.accountBalanceValues -= bill.values;
       }
     } else {
-      await addToBalance(bill.value, bill.values);
+      if (bill.isDaily) await addToBalance(bill.value, bill.values);
       if (user) {
         user.accountBalance += bill.value;
         user.accountBalanceValues += bill.values;
